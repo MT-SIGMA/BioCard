@@ -1,353 +1,49 @@
-<picture>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>profile.sh --live</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 
-:root{
-  --bg-app:#04060c;
-  --bg-window-a:#0A101F;
-  --bg-window-b:#0C1426;
-  --bg-panel:#0A101F;
-  --bg-titlebar:#0B1222;
-  --border:rgba(255,255,255,0.10);
-  --border-soft:rgba(255,255,255,0.08);
-  --a1:#7C3AED;
-  --a2:#22D3EE;
-  --a3:#10B981;
-  --hue-dim:#3b4a6b;
-  --hue-soft:rgba(34,211,238,0.10);
-  --live:#F87171;
-  --text:#F8FAFC;
-  --text-dim:#94A3B8;
-  --text-faint:#475569;
-  --leader:rgba(148,163,184,0.35);
-  --mono:'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
-}
-
-[data-theme="light"]{
-  --bg-app:#e9ebf2;
-  --bg-window-a:#FBFBFE;
-  --bg-window-b:#F1F0FB;
-  --bg-panel:#FBFBFE;
-  --bg-titlebar:#F2F1FA;
-  --border:rgba(30,20,60,0.10);
-  --border-soft:rgba(30,20,60,0.08);
-  --a1:#7C3AED;
-  --a2:#0891B2;
-  --a3:#059669;
-  --hue-dim:#b6b3d6;
-  --hue-soft:rgba(124,58,237,0.08);
-  --live:#c23b3b;
-  --text:#1c1830;
-  --text-dim:#5b5a72;
-  --text-faint:#9491ab;
-  --leader:rgba(90,85,120,0.35);
-}
-
-*{box-sizing:border-box;}
-html,body{
-  margin:0;
-  padding:0;
-  background:var(--bg-app);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:100vh;
-  font-family:var(--mono);
-}
-
-.stage{
-  padding:28px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:14px;
-}
-
-.window-wrap{
-  position:relative;
-  width:1180px;
-  max-width:96vw;
-  border-radius:18px;
-}
-.window-wrap::before{
-  content:'';
-  position:absolute;
-  inset:-10px;
-  border-radius:26px;
-  background:linear-gradient(90deg,var(--a1),var(--a2),var(--a3),var(--a1));
-  background-size:300% 100%;
-  filter:blur(14px);
-  opacity:.42;
-  animation:hueTravel 10s linear infinite;
-  z-index:0;
-}
-.window-wrap::after{
-  content:'';
-  position:absolute;
-  inset:-1.6px;
-  border-radius:19px;
-  padding:1.6px;
-  background:linear-gradient(90deg,var(--a1),var(--a2),var(--a3),var(--a1));
-  background-size:300% 100%;
-  animation:hueTravel 10s linear infinite;
-  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-  opacity:.65;
-  z-index:2;
-  pointer-events:none;
-}
-@keyframes hueTravel{
-  0%{background-position:0% 0%;}
-  100%{background-position:300% 0%;}
-}
-
-.window{
-  position:relative;
-  z-index:1;
-  width:1180px;
-  height:610px;
-  max-width:96vw;
-  background:linear-gradient(180deg, var(--bg-window-a), var(--bg-window-b));
-  border-radius:18px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  box-shadow:0 40px 90px -30px rgba(0,0,0,0.65);
-  transition:background .35s ease;
-}
-
-/* ---- title bar ---- */
-.titlebar{
-  position:relative;
-  height:46px;
-  min-height:46px;
-  background:var(--bg-titlebar);
-  border-bottom:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  padding:0 18px;
-  gap:10px;
-  font-size:12px;
-  letter-spacing:.02em;
-  color:var(--text-dim);
-}
-.tb-lights{display:flex;gap:8px;}
-.tb-light{width:11px;height:11px;border-radius:50%;}
-.tb-light.r{background:#ff5f56;}
-.tb-light.y{background:#ffbd2e;}
-.tb-light.g{background:#27c93f;}
-.tb-cmd{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  color:var(--text-dim);
-  white-space:nowrap;
-}
-.tb-cmd b{color:var(--text);font-weight:500;}
-.tb-spacer{flex:1;}
-.theme-toggle{
-  border:1px solid var(--border);
-  background:transparent;
-  color:var(--text-dim);
-  font-family:var(--mono);
-  font-size:10.5px;
-  letter-spacing:.06em;
-  padding:3px 9px;
-  border-radius:4px;
-  cursor:pointer;
-  position:relative;
-  z-index:3;
-}
-.theme-toggle:hover{color:var(--text);border-color:var(--a2);}
-
-/* ---- body split ---- */
-.body{
-  flex:1;
-  display:flex;
-  min-height:0;
-}
-
-.visual-col{
-  width:38%;
-  min-width:38%;
-  border-right:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  background:
-    radial-gradient(120% 90% at 30% 0%, var(--hue-soft), transparent 60%),
-    var(--bg-panel);
-}
-
-.panel-label{
-  font-size:10px;
-  letter-spacing:.24em;
-  color:var(--text-faint);
-  padding:14px 16px 0 16px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.panel-label .rule{
-  flex:1;
-  height:1px;
-  background:var(--border-soft);
-}
-
-.visual-frame{
-  flex:1;
-  margin:12px 16px 16px 16px;
-  border:1px solid rgba(34,211,238,0.35);
-  border-radius:10px;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 0 22px -4px rgba(34,211,238,0.35), inset 0 0 30px -18px rgba(124,58,237,0.5);
-  background:
-    linear-gradient(180deg, var(--hue-soft), transparent 40%),
-    var(--bg-window-a);
-}
-.visual-frame svg{
-  width:100%;
-  height:100%;
-  display:block;
-}
-.frame-caption{
-  position:absolute;
-  left:10px;
-  bottom:8px;
-  font-size:9.5px;
-  letter-spacing:.1em;
-  color:var(--text-faint);
-  display:flex;
-  gap:6px;
-  align-items:center;
-}
-.frame-caption .cap-live{
-  color:var(--live);
-  font-weight:600;
-}
-
-/* ---- info column ---- */
-.info-col{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  min-width:0;
-}
-
-.rows-wrap{
-  flex:1;
-  padding:16px 20px 16px 20px;
-  overflow:hidden;
-}
-svg.rows-svg{width:100%;height:100%;display:block;overflow:visible;}
-
-.sysinfo-header-label{
-  fill:var(--a2);
-  font-size:13px;
-  letter-spacing:.1em;
-  text-shadow:0 0 10px rgba(34,211,238,0.55);
-}
-.live-dot-svg{
-  fill:var(--live);
-  animation:livePulseSvg 1.6s ease-in-out infinite;
-  transform-origin:center;
-  transform-box:fill-box;
-}
-@keyframes livePulseSvg{
-  0%,100%{opacity:1;}
-  50%{opacity:.25;}
-}
-.live-text-svg{
-  fill:var(--live);
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:.08em;
-}
-.pill-rect-svg{
-  fill:#4C1D95;
-}
-[data-theme="light"] .pill-rect-svg{ fill:#7C3AED; }
-.pill-text-svg{
-  fill:#E9D5FF;
-  font-size:14px;
-  font-weight:700;
-  letter-spacing:.02em;
-}
-[data-theme="light"] .pill-text-svg{ fill:#fff; }
-.closing-line-svg{
-  fill:var(--text-dim);
-  font-size:14px;
-}
-.closing-cursor-svg{
-  fill:var(--a2);
-  animation:blinkSvg 1s step-start infinite;
-}
-@keyframes blinkSvg{50%{opacity:0;}}
-
-.section-tag{
-  fill:var(--text-dim);
-  font-size:13px;
-  letter-spacing:.1em;
-}
-.row-label{
-  fill:var(--a2);
-  font-size:14px;
-}
-.row-value{
-  fill:var(--text);
-  font-size:14px;
-  font-weight:600;
-}
-a.row-link{cursor:pointer;}
-.row-link .row-value{fill:var(--a2);}
-.row-link .row-value:hover{text-decoration:underline;}
-.row-anim{opacity:0;animation:rowIn .4s ease forwards;}
-@keyframes rowIn{ from{opacity:0; transform:translateX(-8px);} to{opacity:1; transform:translateX(0);} }
-</style>
 </head>
-<body>
+<body style="margin:0; padding:0; background:#04060c; display:flex; align-items:center; justify-content:center; min-height:100vh; font-family:'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace;" id="appBody">
 
-<div class="stage">
-  <div class="window-wrap">
-  <div class="window" id="window" data-theme="dark">
-    <div class="titlebar">
-      <span class="tb-lights"><span class="tb-light r"></span><span class="tb-light y"></span><span class="tb-light g"></span></span>
-      <span class="tb-cmd">mohammadasri553@gmail.com - % <b>./profile.sh --live</b></span>
-      <span class="tb-spacer"></span>
-      <button class="theme-toggle" id="themeToggle">MODE · DARK</button>
-    </div>
-
-    <div class="body">
-      <div class="visual-col">
-        <div class="panel-label">VISUAL.MAP<span class="rule"></span></div>
-        <div class="visual-frame" id="visualFrame">
-          <svg id="portraitSvg" viewBox="0 0 300 340" preserveAspectRatio="xMidYMid slice">
-            <defs>
-              <linearGradient id="dotGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#60A5FA"/>
-                <stop offset="0.45" stop-color="#A78BFA"/>
-                <stop offset="1" stop-color="#22D3EE"/>
-                <animateTransform attributeName="gradientTransform" type="translate" values="0 -0.35; 0 0.35; 0 -0.35" dur="9s" repeatCount="indefinite"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <div class="frame-caption"><span class="cap-live">●</span><span>REC 300×340</span></div>
-        </div>
+<div style="padding:28px; display:flex; flex-direction:column; align-items:center; gap:14px;">
+  <div style="position:relative; width:1180px; max-width:96vw; border-radius:18px;">
+    <div style="position:absolute; inset:-10px; border-radius:26px; background:linear-gradient(90deg,#7C3AED,#22D3EE,#10B981,#7C3AED); background-size:300% 100%; filter:blur(14px); opacity:.42; z-index:0; animation:hueTravel 10s linear infinite;"></div>
+    <div style="position:absolute; inset:-1.6px; border-radius:19px; padding:1.6px; background:linear-gradient(90deg,#7C3AED,#22D3EE,#10B981,#7C3AED); background-size:300% 100%; animation:hueTravel 10s linear infinite; opacity:.65; z-index:2; pointer-events:none; -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite:exclude;"></div>
+    <div id="window" data-theme="dark" style="position:relative; z-index:1; width:1180px; height:610px; max-width:96vw; background:linear-gradient(180deg, #0A101F, #0C1426); border-radius:18px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 40px 90px -30px rgba(0,0,0,0.65); transition:background .35s ease;">
+      <div id="titlebar" style="position:relative; height:46px; min-height:46px; background:#0B1222; border-bottom:1px solid rgba(255,255,255,0.10); display:flex; align-items:center; padding:0 18px; gap:10px; font-size:12px; letter-spacing:.02em; color:#94A3B8;">
+        <span style="display:flex; gap:8px;"><span style="width:11px; height:11px; border-radius:50%; background:#ff5f56; display:inline-block;"></span><span style="width:11px; height:11px; border-radius:50%; background:#ffbd2e; display:inline-block;"></span><span style="width:11px; height:11px; border-radius:50%; background:#27c93f; display:inline-block;"></span></span>
+        <span id="titlebarCmd" style="position:absolute; left:50%; transform:translateX(-50%); color:#94A3B8; white-space:nowrap;">mohammadasri553@gmail.com - % <b style="color:#F8FAFC; font-weight:500;">./profile.sh --live</b></span>
+        <span style="flex:1;"></span>
+        <button id="themeToggle" style="border:1px solid rgba(255,255,255,0.10); background:transparent; color:#94A3B8; font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:.06em; padding:3px 9px; border-radius:4px; cursor:pointer; position:relative; z-index:3;">MODE · DARK</button>
       </div>
 
-      <div class="info-col">
-        <div class="rows-wrap">
-          <svg class="rows-svg" id="rowsSvg"></svg>
+      <div style="flex:1; display:flex; min-height:0;">
+        <div id="visualCol" style="width:38%; min-width:38%; border-right:1px solid rgba(255,255,255,0.10); display:flex; flex-direction:column; background:radial-gradient(120% 90% at 30% 0%, rgba(34,211,238,0.10), transparent 60%), #0A101F;">
+          <div id="visualLabel" style="font-size:10px; letter-spacing:.24em; color:#475569; padding:14px 16px 0 16px; display:flex; align-items:center; gap:8px;">VISUAL.MAP<span style="flex:1; height:1px; background:rgba(255,255,255,0.08); display:block;"></span></div>
+          <div id="visualFrame" style="flex:1; margin:12px 16px 16px 16px; border:1px solid rgba(34,211,238,0.35); border-radius:10px; position:relative; overflow:hidden; box-shadow:0 0 22px -4px rgba(34,211,238,0.35), inset 0 0 30px -18px rgba(124,58,237,0.5); background:linear-gradient(180deg, rgba(34,211,238,0.10), transparent 40%), #0A101F;">
+            <svg id="portraitSvg" viewBox="0 0 300 340" preserveAspectRatio="xMidYMid slice" style="width:100%; height:100%; display:block;">
+              <defs>
+                <linearGradient id="dotGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#60A5FA"/>
+                  <stop offset="0.45" stop-color="#A78BFA"/>
+                  <stop offset="1" stop-color="#22D3EE"/>
+                  <animateTransform attributeName="gradientTransform" type="translate" values="0 -0.35; 0 0.35; 0 -0.35" dur="9s" repeatCount="indefinite"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          <div id="visualCaption" style="position:absolute; left:10px; bottom:8px; font-size:9.5px; letter-spacing:.1em; color:#475569; display:flex; gap:6px; align-items:center;"><span style="color:#F87171; font-weight:600;">●</span><span>REC 300×340</span></div>
+          </div>
+        </div>
+
+        <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+          <div style="flex:1; padding:16px 20px 16px 20px; overflow:hidden;">
+            <svg id="rowsSvg" style="width:100%; height:100%; display:block; overflow:visible;"></svg>
+          </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 </div>
 
@@ -361,6 +57,26 @@ a.row-link{cursor:pointer;}
   var win = document.getElementById("window");
   var portraitSvg = document.getElementById("portraitSvg");
   var DOT = 1.15; // dot stroke run length in viewBox units
+
+  // inject keyframes for animations
+  var styleTag = document.createElement("style");
+  styleTag.textContent = 
+    "@keyframes hueTravel {" +
+      "0% { background-position: 0% 0%; }" +
+      "100% { background-position: 300% 0%; }" +
+    "}" +
+    "@keyframes rowIn {" +
+      "from { opacity: 0; transform: translateX(-8px); }" +
+      "to { opacity: 1; transform: translateX(0); }" +
+    "}" +
+    "@keyframes livePulseSvg {" +
+      "0%, 100% { opacity: 1; }" +
+      "50% { opacity: 0.25; }" +
+    "}" +
+    "@keyframes blinkSvg {" +
+      "50% { opacity: 0; }" +
+    "}";
+  document.head.appendChild(styleTag);
 
   // ---------- helpers ----------
   function el(tag, attrs) {
@@ -566,11 +282,12 @@ a.row-link{cursor:pointer;}
         "stroke-width": 1.35,
         "stroke-linecap": "square",
         "shape-rendering": "crispEdges",
-        opacity: "0",
-        class: "introDot"
+        opacity: "0"
       });
       var delay = (g / 60) * 1.6;
-      gp.style.animation = "introFade 0.5s ease " + delay.toFixed(3) + "s forwards";
+      gp.style.transition = "opacity 0.5s ease";
+      gp.style.transitionDelay = delay.toFixed(3) + "s";
+      gp.style.opacity = "1";
       introLayer.appendChild(gp);
     }
     portraitSvg.appendChild(introLayer);
@@ -596,19 +313,93 @@ a.row-link{cursor:pointer;}
     }, T_INTRO * 1000);
   }
 
-  // inject keyframes for intro fade (added once)
-  var styleTag = document.createElement("style");
-  styleTag.textContent = "@keyframes introFade{from{opacity:0;}to{opacity:1;}}";
-  document.head.appendChild(styleTag);
-
   // ---------- theme toggle ----------
+  var THEME = {
+    dark: {
+      app: "#04060c",
+      panel: "#0A101F",
+      panelB: "#0C1426",
+      title: "#0B1222",
+      border: "rgba(255,255,255,0.10)",
+      borderSoft: "rgba(255,255,255,0.08)",
+      accentA: "#7C3AED",
+      accentB: "#22D3EE",
+      accentC: "#10B981",
+      text: "#F8FAFC",
+      textDim: "#94A3B8",
+      textFaint: "#475569",
+      leader: "rgba(148,163,184,0.35)",
+      live: "#F87171",
+      glow: "rgba(34,211,238,0.35)",
+      bgGlow: "rgba(34,211,238,0.10)"
+    },
+    light: {
+      app: "#e9ebf2",
+      panel: "#FBFBFE",
+      panelB: "#F1F0FB",
+      title: "#F2F1FA",
+      border: "rgba(30,20,60,0.10)",
+      borderSoft: "rgba(30,20,60,0.08)",
+      accentA: "#7C3AED",
+      accentB: "#0891B2",
+      accentC: "#059669",
+      text: "#1c1830",
+      textDim: "#5b5a72",
+      textFaint: "#9491ab",
+      leader: "rgba(90,85,120,0.35)",
+      live: "#c23b3b",
+      glow: "rgba(124,58,237,0.25)",
+      bgGlow: "rgba(124,58,237,0.08)"
+    }
+  };
+
+  var appBody = document.getElementById("appBody");
+  var titlebar = document.getElementById("titlebar");
+  var titlebarCmd = document.getElementById("titlebarCmd");
+  var visualCol = document.getElementById("visualCol");
+  var visualLabel = document.getElementById("visualLabel");
+  var visualFrame = document.getElementById("visualFrame");
+  var visualCaption = document.getElementById("visualCaption");
   var themeToggle = document.getElementById("themeToggle");
+  
   function setTheme(t) {
     currentTheme = t;
+    var palette = THEME[t] || THEME.dark;
+    
     win.setAttribute("data-theme", t);
+    appBody.style.background = palette.app;
+    
+    win.style.background = "linear-gradient(180deg, " + palette.panel + ", " + palette.panelB + ")";
+    win.style.boxShadow = "0 40px 90px -30px rgba(0,0,0,0.65)";
+    
+    titlebar.style.background = palette.title;
+    titlebar.style.borderBottomColor = palette.border;
+    titlebar.style.color = palette.textDim;
+    titlebarCmd.style.color = palette.textDim;
+    
+    visualCol.style.background = "radial-gradient(120% 90% at 30% 0%, " + palette.bgGlow + ", transparent 60%), " + palette.panel;
+    visualCol.style.borderRightColor = palette.border;
+    
+    visualLabel.style.color = palette.textFaint;
+    var ruleLine = visualLabel.querySelector("span:last-child");
+    if (ruleLine) ruleLine.style.background = palette.borderSoft;
+    
+    visualFrame.style.borderColor = palette.glow;
+    visualFrame.style.boxShadow = "0 0 22px -4px " + palette.glow + ", inset 0 0 30px -18px rgba(124,58,237,0.5)";
+    visualFrame.style.background = "linear-gradient(180deg, " + palette.bgGlow + ", transparent 40%), " + palette.panel;
+    
+    visualCaption.style.color = palette.textFaint;
+    var captionDot = visualCaption.querySelector("span:first-child");
+    if (captionDot) captionDot.style.color = palette.live;
+    
     themeToggle.textContent = "MODE · " + (t === "dark" ? "DARK" : "LIGHT");
+    themeToggle.style.borderColor = palette.border;
+    themeToggle.style.color = palette.textDim;
+    
     buildPortrait(t);
+    buildRows();
   }
+  
   themeToggle.addEventListener("click", function () {
     setTheme(currentTheme === "dark" ? "light" : "dark");
   });
@@ -680,7 +471,8 @@ a.row-link{cursor:pointer;}
     var delayStep = 0.075;
 
     rows.forEach(function (r) {
-      var rowGroup = el("g", { class: "row-anim" });
+      var rowGroup = el("g");
+      rowGroup.style.animation = "rowIn 0.4s ease forwards";
       rowGroup.style.animationDelay = delay.toFixed(3) + "s";
       delay += delayStep;
 
@@ -690,7 +482,7 @@ a.row-link{cursor:pointer;}
       }
 
       if (r.type === "header") {
-        var sysLabel = el("text", { x: 0, y: y, class: "sysinfo-header-label" });
+        var sysLabel = el("text", { x: 0, y: y, fill: THEME[currentTheme].accentB, "font-size": 13, "letter-spacing": ".1em" });
         sysLabel.textContent = "SYSTEM.INFO";
         rowGroup.appendChild(sysLabel);
         var sysLabelW = textWidth("SYSTEM.INFO", 13, 500);
@@ -708,15 +500,16 @@ a.row-link{cursor:pointer;}
           for (var hk = 0; hk < hcount; hk++) {
             hd += "M" + (hStartX + hk * hpitch).toFixed(1) + "," + (y - 3.6) + "h0.8";
           }
-          rowGroup.appendChild(el("path", {
-            d: hd, stroke: "var(--leader)", "stroke-width": 1,
+          var leaderPath = el("path", {
+            d: hd, stroke: THEME[currentTheme].leader, "stroke-width": 1,
             "stroke-linecap": "round", "shape-rendering": "crispEdges", fill: "none"
-          }));
+          });
+          rowGroup.appendChild(leaderPath);
         }
-        var liveGroup = el("g", { class: "live-badge-svg" });
-        var liveDot = el("circle", { cx: W - liveW + 4, cy: y - 4, r: 3, class: "live-dot-svg" });
+        var liveGroup = el("g");
+        var liveDot = el("circle", { cx: W - liveW + 4, cy: y - 4, r: 3, fill: THEME[currentTheme].live, opacity: 1 });
         var liveText = el("text", {
-          x: W, y: y, class: "live-text-svg", "text-anchor": "end",
+          x: W, y: y, fill: THEME[currentTheme].live, "font-size": 12, "font-weight": 700, "letter-spacing": ".08em", "text-anchor": "end",
           textLength: liveW.toFixed(1), lengthAdjust: "spacingAndGlyphs"
         });
         liveText.textContent = liveStr;
@@ -734,10 +527,10 @@ a.row-link{cursor:pointer;}
         var pillW = pillTextW + pillPadX * 2;
         var pillY = y - 16;
         rowGroup.appendChild(el("rect", {
-          x: 0, y: pillY, width: pillW.toFixed(1), height: pillH, rx: 4, class: "pill-rect-svg"
+          x: 0, y: pillY, width: pillW.toFixed(1), height: pillH, rx: 4, fill: THEME[currentTheme].accentA
         }));
         var pillText = el("text", {
-          x: pillPadX, y: pillY + pillH / 2 + 5, class: "pill-text-svg",
+          x: pillPadX, y: pillY + pillH / 2 + 5, fill: currentTheme === "dark" ? "#E9D5FF" : "#fff", "font-size": 14, "font-weight": 700, "letter-spacing": ".02em",
           textLength: pillTextW.toFixed(1), lengthAdjust: "spacingAndGlyphs"
         });
         pillText.textContent = r.value;
@@ -748,10 +541,10 @@ a.row-link{cursor:pointer;}
       }
 
       if (r.type === "closing") {
-        var closeText = el("text", { x: 0, y: y, class: "closing-line-svg" });
+        var closeText = el("text", { x: 0, y: y, fill: THEME[currentTheme].textDim, "font-size": 14 });
         var t1 = el("tspan", {});
         t1.textContent = "\u25B8 More about me & projects below in README \u2193 ";
-        var t2 = el("tspan", { class: "closing-cursor-svg" });
+        var t2 = el("tspan", { fill: THEME[currentTheme].accentB });
         t2.textContent = "\u2588";
         closeText.appendChild(t1);
         closeText.appendChild(t2);
@@ -763,7 +556,7 @@ a.row-link{cursor:pointer;}
 
       if (r.type === "section") {
         y += 8;
-        var tag = el("text", { x: 0, y: y, class: "section-tag" });
+        var tag = el("text", { x: 0, y: y, fill: THEME[currentTheme].textDim, "font-size": 13, "letter-spacing": ".1em" });
         tag.textContent = "- " + r.label + " ";
         rowGroup.appendChild(tag);
         var tagW = textWidth("- " + r.label + " ", 13, 400);
@@ -777,7 +570,7 @@ a.row-link{cursor:pointer;}
             dd += "M" + dx0.toFixed(1) + "," + (y - 4.2) + "h4";
           }
           var dashPath = el("path", {
-            d: dd, stroke: "var(--leader)", "stroke-width": 1,
+            d: dd, stroke: THEME[currentTheme].leader, "stroke-width": 1,
             "shape-rendering": "crispEdges", fill: "none"
           });
           rowGroup.appendChild(dashPath);
@@ -787,7 +580,7 @@ a.row-link{cursor:pointer;}
         return;
       }
 
-      var labelText = el("text", { x: 0, y: y, class: "row-label" });
+      var labelText = el("text", { x: 0, y: y, fill: THEME[currentTheme].accentB, "font-size": 14 });
       labelText.textContent = r.label;
       rowGroup.appendChild(labelText);
       var labelW = textWidth(r.label, ROW_SIZE, 400);
@@ -798,7 +591,7 @@ a.row-link{cursor:pointer;}
 
       var valueGroup;
       if (r.href) {
-        valueGroup = el("a", { class: "row-link" });
+        valueGroup = el("a");
         valueGroup.setAttributeNS("http://www.w3.org/1999/xlink", "href", r.href);
         valueGroup.setAttribute("target", "_blank");
         valueGroup.setAttribute("rel", "noopener noreferrer");
@@ -806,7 +599,7 @@ a.row-link{cursor:pointer;}
         valueGroup = el("g", {});
       }
       var valueText = el("text", {
-        x: valueX, y: y, class: "row-value",
+        x: valueX, y: y, fill: r.href ? THEME[currentTheme].accentB : THEME[currentTheme].text, "font-size": 14, "font-weight": 600,
         "text-anchor": "end",
         textLength: valueW.toFixed(1),
         lengthAdjust: "spacingAndGlyphs"
@@ -831,7 +624,7 @@ a.row-link{cursor:pointer;}
           ld += "M" + lx + "," + (y - 3.6) + "h0.8";
         }
         var leaderPath = el("path", {
-          d: ld, stroke: "var(--leader)", "stroke-width": 1,
+          d: ld, stroke: THEME[currentTheme].leader, "stroke-width": 1,
           "stroke-linecap": "round", "shape-rendering": "crispEdges", fill: "none"
         });
         rowGroup.appendChild(leaderPath);
@@ -860,7 +653,3 @@ a.row-link{cursor:pointer;}
 </script>
 </body>
 </html>
-</picture>
-
-
-<picture>
