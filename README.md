@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>profile.sh --live</title>
 
-</head>
 <body style="margin:0; padding:0; background:#04060c; display:flex; align-items:center; justify-content:center; min-height:100vh; font-family:'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace;" id="appBody">
 
 <div style="padding:28px; display:flex; flex-direction:column; align-items:center; gap:14px;">
@@ -652,4 +646,3 @@
 
 </script>
 </body>
-</html>
